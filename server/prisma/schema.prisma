@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoCuentaGithub {
+  INSTITUTIONAL
+  PERSONAL
+}
+
+enum TipoGrupo {
+  INDIVIDUAL
+  GROUP
+}
+
+enum DiaSemana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+model Usuario {
+  id                 Int                 @id @default(autoincrement())
+  nombre             String
+  apellido           String
+  telefono           String
+  ci                 Int
+  correo             String              @unique
+  password           String
+  idRol              Int
+  activo             Boolean
+  rol                Rol                 @relation(fields: [idRol], references: [id])
+  githubAuth         GithubAuth[]
+  instalaciones      InstGithubApp[]
+  membresias         MiembroProyecto[]
+  GithubLinkPair     GithubLinkPair?
+  codigo             String?             @unique
+  idFacultad         Int?
+  facultad           Facultad?           @relation(fields: [idFacultad], references: [id])
+  idCarrera          Int?
+  carrera            Carrera?            @relation(fields: [idCarrera], references: [id])
+  semestreId         Int?
+  semestre           Semestre?           @relation(fields: [semestreId], references: [id])
+  esDirector         Boolean             @default(false)
+  inscripciones      Inscripcion[]
+  docenteMaterias    DocenteMateria[]
+  estudianteMaterias EstudianteMateria[]
+}
+
+model Rol {
+  id      Int       @id @default(autoincrement())
+  nombre  String    @unique
+  Usuario Usuario[]
+}
+
+model Facultad {
+  id      Int       @id @default(autoincrement())
+  nombre  String
+  theme   Json?
+  Carrera Carrera[]
+  Usuario Usuario[]
+}
+
+model Carrera {
+  id         Int        @id @default(autoincrement())
+  nombre     String
+  idFacultad Int
+  facultad   Facultad   @relation(fields: [idFacultad], references: [id])
+  Materia    Materia[]
+  semestres  Semestre[]
+  Usuario    Usuario[]
+
+  sigla String? @unique
+}
+
+model Semestre {
+  id        Int       @id @default(autoincrement())
+  numero    Int
+  etiqueta  String    @default("")
+  carreraId Int
+  carrera   Carrera   @relation(fields: [carreraId], references: [id])
+  materias  Materia[]
+  Usuario   Usuario[]
+
+  @@unique([carreraId, numero])
+}
+
+model Materia {
+  id        Int     @id @default(autoincrement())
+  nombre    String
+  codigo    String  @unique
+  idCarrera Int
+  carrera   Carrera @relation(fields: [idCarrera], references: [id])
+
+  semestreId Int?
+  semestre   Semestre? @relation(fields: [semestreId], references: [id])
+
+  horarios          Horario[]
+  docentes          DocenteMateria[]
+  inscripciones     Inscripcion[]
+  EstudianteMateria EstudianteMateria[]
+}
+
+model Horario {
+  id         Int       @id @default(autoincrement())
+  materiaId  Int
+  materia    Materia   @relation(fields: [materiaId], references: [id])
+  dia        DiaSemana
+  horaInicio DateTime
+  horaFin    DateTime
+  aula       String
+
+  @@index([materiaId, dia])
+}
+
+model Inscripcion {
+  id        Int @id @default(autoincrement())
+  usuarioId Int
+  materiaId Int
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  materia Materia @relation(fields: [materiaId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([usuarioId, materiaId])
+}
+
+model DocenteMateria {
+  id        Int     @id @default(autoincrement())
+  usuarioId Int
+  materiaId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  materia   Materia @relation(fields: [materiaId], references: [id])
+
+  @@unique([usuarioId, materiaId])
+}
+
+model EstudianteMateria {
+  id        Int     @id @default(autoincrement())
+  usuarioId Int
+  materiaId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  materia   Materia @relation(fields: [materiaId], references: [id])
+
+  @@unique([usuarioId, materiaId])
+}
+
+/**
+ * ===================== DOCUMENTOS & PLAGIO =====================
+ */
+
+model Documento {
+  id                    Int      @id @default(autoincrement())
+  nombre                String
+  ruta                  String
+  mimetype              String
+  tamano                Int
+  creadoEn              DateTime @default(now())
+  contenidoTexto        String?
+  esRepositorioUnifranz Boolean  @default(false)
+
+  analisis AnalisisPlagio[]
+}
+
+model AnalisisPlagio {
+  id          Int       @id @default(autoincrement())
+  documentoId Int
+  documento   Documento @relation(fields: [documentoId], references: [id])
+
+  originalidad      Float
+  plagioWeb         Float
+  plagioUniversidad Float
+  contenidoIA       Float
+  nivelRiesgo       String
+  resumenJson       Json?
+  creadoEn          DateTime @default(now())
+
+  fuentes    FuentePlagio[]
+  fragmentos FragmentoPlagio[]
+}
+
+model FuentePlagio {
+  id         Int            @id @default(autoincrement())
+  analisisId Int
+  analisis   AnalisisPlagio @relation(fields: [analisisId], references: [id])
+
+  tipo         String
+  titulo       String
+  autor        String?
+  url          String?
+  coincidencia Int
+}
+
+model FragmentoPlagio {
+  id         Int            @id @default(autoincrement())
+  analisisId Int
+  analisis   AnalisisPlagio @relation(fields: [analisisId], references: [id])
+
+  inicio      Int
+  fin         Int
+  texto       String
+  tipo        String
+  fuenteLabel String?
+}
+
+/**
+ * ===================== GITHUB & PROYECTOS =====================
+ */
+
+model GithubAuth {
+  id          Int              @id @default(autoincrement())
+  usuarioId   Int
+  usuario     Usuario          @relation(fields: [usuarioId], references: [id])
+  tipoCuenta  TipoCuentaGithub
+  githubId    Int
+  login       String
+  avatarUrl   String?
+  correo      String?
+  accessToken String
+  tokenType   String?
+  scopes      String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([usuarioId, tipoCuenta])
+  @@unique([githubId, tipoCuenta])
+}
+
+model InstGithubApp {
+  id             Int      @id @default(autoincrement())
+  usuarioId      Int
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id])
+  installationId Int      @unique
+  accountLogin   String?
+  accountId      Int?
+  createdAt      DateTime @default(now())
+}
+
+model GithubLinkPair {
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int      @unique
+  instGithubId Int?
+  instLogin    String?
+  instEmail    String?
+  perGithubId  Int?
+  perLogin     String?
+  perEmail     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user Usuario @relation(fields: [usuarioId], references: [id])
+}
+
+model Proyecto {
+  id            Int               @id @default(autoincrement())
+  titulo        String
+  codigoMateria String?
+  tipoGrupo     TipoGrupo         @default(GROUP)
+  repoUrl       String?
+  miembros      MiembroProyecto[]
+  hitos         HitoProyecto[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model HitoProyecto {
+  id          Int       @id @default(autoincrement())
+  proyectoId  Int
+  proyecto    Proyecto  @relation(fields: [proyectoId], references: [id])
+  orden       Int
+  nombre      String
+  peso        Int?
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  estado      String?
+
+  @@unique([proyectoId, orden])
+}
+
+model MiembroProyecto {
+  id         Int      @id @default(autoincrement())
+  proyectoId Int
+  usuarioId  Int
+  rol        String
+  proyecto   Proyecto @relation(fields: [proyectoId], references: [id])
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  joinedAt   DateTime @default(now())
+
+  @@unique([proyectoId, usuarioId])
+}
