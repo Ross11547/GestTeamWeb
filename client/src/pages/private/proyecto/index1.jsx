@@ -1,10 +1,10 @@
 // src/screens/Estudiante/ProyectoUno.jsx - Diseño Premium Completo
-import React, { useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { api } from '../../../services/api';
-import { toast } from 'sonner';
-import CardHeader from '../../../components/ui/cardHeader';
-import { useColors } from '../../../style/colors';
+import React, { useEffect, useState } from "react";
+import styled, { keyframes } from "styled-components";
+import { api } from "../../../services/api";
+import { toast } from "sonner";
+import CardHeader from "../../../components/ui/cardHeader";
+import { useColors } from "../../../style/colors";
 import {
   Github,
   GitBranch,
@@ -37,8 +37,8 @@ import {
   XCircle,
   Clock,
   Activity,
-  GraduationCap
-} from 'lucide-react';
+  GraduationCap,
+} from "lucide-react";
 
 // ==== ANIMACIONES ====
 const fadeIn = keyframes`
@@ -98,7 +98,7 @@ const Card = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.04);
   animation: ${slideIn} 0.3s ease;
   transition: all 0.3s ease;
-  
+
   &:hover {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   }
@@ -141,10 +141,10 @@ const Btn = styled.button`
   border: none;
   position: relative;
   overflow: hidden;
-  
+
   ${({ $variant, Colors }) => {
     switch ($variant) {
-      case 'primary':
+      case "primary":
         return `
           background: ${Colors.primary};
           color: white;
@@ -156,7 +156,7 @@ const Btn = styled.button`
             background: ${Colors.primary}ee;
           }
         `;
-      case 'success':
+      case "success":
         return `
           background: #10B981;
           color: white;
@@ -168,7 +168,7 @@ const Btn = styled.button`
             background: #059669;
           }
         `;
-      case 'danger':
+      case "danger":
         return `
           background: #EF4444;
           color: white;
@@ -195,23 +195,23 @@ const Btn = styled.button`
         `;
     }
   }}
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none !important;
   }
-  
+
   svg {
     transition: transform 0.2s ease;
   }
-  
+
   &:hover svg {
-    transform: ${({ $loading }) => $loading ? 'none' : 'scale(1.1)'};
+    transform: ${({ $loading }) => ($loading ? "none" : "scale(1.1)")};
   }
 `;
 
@@ -228,14 +228,19 @@ const StatusCard = styled.div`
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: ${({ $ok }) => $ok ? 'linear-gradient(135deg, #f0fdf4, #dcfce7)' : 'linear-gradient(135deg, #fef2f2, #fee2e2)'};
-  border: 2px solid ${({ $ok }) => $ok ? '#86efac' : '#fca5a5'};
+  background: ${({ $ok }) =>
+    $ok
+      ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
+      : "linear-gradient(135deg, #fef2f2, #fee2e2)"};
+  border: 2px solid ${({ $ok }) => ($ok ? "#86efac" : "#fca5a5")};
   border-radius: 16px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px ${({ $ok }) => $ok ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+    box-shadow: 0 8px 20px
+      ${({ $ok }) =>
+        $ok ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)"};
   }
 `;
 
@@ -245,7 +250,7 @@ const StatusIcon = styled.div`
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: ${({ $ok }) => $ok ? '#22c55e' : '#ef4444'};
+  background: ${({ $ok }) => ($ok ? "#22c55e" : "#ef4444")};
   border-radius: 12px;
   color: white;
   flex-shrink: 0;
@@ -260,14 +265,14 @@ const StatusLabel = styled.div`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: ${({ $ok }) => $ok ? '#15803d' : '#991b1b'};
+  color: ${({ $ok }) => ($ok ? "#15803d" : "#991b1b")};
   margin-bottom: 4px;
 `;
 
 const StatusValue = styled.div`
   font-size: 18px;
   font-weight: 700;
-  color: ${({ $ok }) => $ok ? '#166534' : '#7f1d1d'};
+  color: ${({ $ok }) => ($ok ? "#166534" : "#7f1d1d")};
 `;
 
 // ==== FORMULARIO DE CREACIÓN ====
@@ -295,7 +300,7 @@ const CreateTitle = styled.h3`
   font-size: 18px;
   font-weight: 700;
   color: #713f12;
-  
+
   svg {
     color: #f59e0b;
   }
@@ -329,18 +334,18 @@ const Input = styled.input`
   font-size: 15px;
   background: white;
   transition: all 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${({ Colors }) => Colors.primary};
     box-shadow: 0 0 0 4px ${({ Colors }) => Colors.primary}20;
     transform: translateY(-1px);
   }
-  
+
   &::placeholder {
     color: #9ca3af;
   }
-  
+
   &:disabled {
     background: #f3f4f6;
     cursor: not-allowed;
@@ -355,14 +360,14 @@ const Select = styled.select`
   background: white;
   transition: all 0.2s ease;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${({ Colors }) => Colors.primary};
     box-shadow: 0 0 0 4px ${({ Colors }) => Colors.primary}20;
     transform: translateY(-1px);
   }
-  
+
   &:hover {
     border-color: ${({ Colors }) => Colors.primary};
   }
@@ -398,11 +403,11 @@ const TableTitle = styled.h3`
 
 const TableWrapper = styled.div`
   overflow-x: auto;
-  
+
   &::-webkit-scrollbar {
     height: 8px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #e5e7eb;
     border-radius: 999px;
@@ -438,15 +443,15 @@ const Tbody = styled.tbody``;
 
 const Tr = styled.tr`
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: linear-gradient(90deg, transparent, #f9fafb, transparent);
-    
+
     td {
       color: #111827;
     }
   }
-  
+
   &:not(:last-child) {
     border-bottom: 1px solid #f3f4f6;
   }
@@ -471,7 +476,11 @@ const ProjectIcon = styled.div`
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, ${({ Colors }) => Colors.primary}20, ${({ Colors }) => Colors.primary}10);
+  background: linear-gradient(
+    135deg,
+    ${({ Colors }) => Colors.primary}20,
+    ${({ Colors }) => Colors.primary}10
+  );
   border-radius: 12px;
   color: ${({ Colors }) => Colors.primary};
   flex-shrink: 0;
@@ -497,18 +506,26 @@ const Badge = styled.span`
   padding: 6px 12px;
   background: ${({ $type }) => {
     switch ($type) {
-      case 'group': return 'linear-gradient(135deg, #dbeafe, #bfdbfe)';
-      case 'individual': return 'linear-gradient(135deg, #f3e8ff, #e9d5ff)';
-      case 'leader': return 'linear-gradient(135deg, #fef3c7, #fed7aa)';
-      default: return '#f3f4f6';
+      case "group":
+        return "linear-gradient(135deg, #dbeafe, #bfdbfe)";
+      case "individual":
+        return "linear-gradient(135deg, #f3e8ff, #e9d5ff)";
+      case "leader":
+        return "linear-gradient(135deg, #fef3c7, #fed7aa)";
+      default:
+        return "#f3f4f6";
     }
   }};
   color: ${({ $type }) => {
     switch ($type) {
-      case 'group': return '#1e40af';
-      case 'individual': return '#6b21a8';
-      case 'leader': return '#92400e';
-      default: return '#374151';
+      case "group":
+        return "#1e40af";
+      case "individual":
+        return "#6b21a8";
+      case "leader":
+        return "#92400e";
+      default:
+        return "#374151";
     }
   }};
   border-radius: 999px;
@@ -528,7 +545,7 @@ const RepoLink = styled.a`
   font-size: 13px;
   font-weight: 600;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: linear-gradient(135deg, #e0f2fe, #bae6fd);
     transform: translateY(-1px);
@@ -547,21 +564,23 @@ const ActionBtn = styled.button`
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: ${({ $primary, Colors }) => $primary ? Colors.primary : 'white'};
-  color: ${({ $primary, Colors }) => $primary ? 'white' : Colors.primary};
+  background: ${({ $primary, Colors }) =>
+    $primary ? Colors.primary : "white"};
+  color: ${({ $primary, Colors }) => ($primary ? "white" : Colors.primary)};
   border: 2px solid ${({ Colors }) => Colors.primary};
   border-radius: 10px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px ${({ Colors }) => Colors.primary}30;
-    background: ${({ $primary, Colors }) => $primary ? Colors.primary + 'ee' : Colors.primary + '10'};
+    background: ${({ $primary, Colors }) =>
+      $primary ? Colors.primary + "ee" : Colors.primary + "10"};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -642,47 +661,26 @@ const HelpText = styled.p`
   font-size: 14px;
   color: #0c4a6e;
   line-height: 1.6;
-  
+
   b {
     color: #075985;
   }
 `;
-
-// ==== MOCK MATERIAS (SIMULACIÓN) ====
-const MOCK_MATERIAS = [
-  {
-    id: 1,
-    nombre: 'Proyecto Integrador Intermedio III',
-    codigo: 'PII',
-    carrera: { nombre: 'Ingeniería de Sistemas' },
-  },
-  {
-    id: 2,
-    nombre: 'Redes II',
-    codigo: 'RED',
-    carrera: { nombre: 'Ingeniería de Sistemas' },
-  },
-  {
-    id: 3,
-    nombre: 'Sistemas de control',
-    codigo: 'SCO',
-    carrera: { nombre: 'Ingeniería de Sistemas' },
-  },
-];
 
 function ProjectsPanel() {
   const Colors = useColors();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [materias, setMaterias] = useState(MOCK_MATERIAS);
+  const [materias, setMaterias] = useState([]);
 
   const [form, setForm] = useState({
-    titulo: '',
-    tipoGrupo: 'GROUP',
-    materiaId: '',
-    codigoMateria: '',
+    titulo: "",
+    tipoGrupo: "GRUPAL",
+    materiaId: "",
+    codigoMateria: "",
   });
+
   const [showCreate, setShowCreate] = useState(false);
 
   const load = async () => {
@@ -691,7 +689,7 @@ function ProjectsPanel() {
       const r = await api.myProjects();
       setItems(r.projects || []);
     } catch (e) {
-      toast.error('Error al cargar proyectos');
+      toast.error("Error al cargar proyectos");
     } finally {
       setLoading(false);
     }
@@ -703,13 +701,30 @@ function ProjectsPanel() {
     setForm((s) => ({
       ...s,
       materiaId,
-      codigoMateria: m ? m.codigo : '',
+      codigoMateria: m ? m.codigo : "",
     }));
+  };
+  const cargarMaterias = async () => {
+    try {
+      const r = await api.myMaterias();
+
+      const lista = r.items || r.data || r.materias || [];
+
+      setMaterias(Array.isArray(lista) ? lista : []);
+    } catch (e) {
+      console.error("Error al cargar materias:", e);
+      toast.error(e.message || "No se pudieron cargar las materias");
+      setMaterias([]);
+    }
   };
 
   useEffect(() => {
-    setMaterias(MOCK_MATERIAS);
-    load();
+    const init = async () => {
+      await cargarMaterias();
+      await load();
+    };
+
+    init();
   }, []);
 
   const onImport = async () => {
@@ -719,7 +734,7 @@ function ProjectsPanel() {
       toast.success(` Importados: ${r.created?.length || 0} repositorios`);
       await load();
     } catch (e) {
-      toast.error(e.message || 'No se pudo importar');
+      toast.error(e.message || "No se pudo importar");
     } finally {
       setLoading(false);
     }
@@ -730,10 +745,10 @@ function ProjectsPanel() {
     try {
       const r = await api.invitePersonalOnAll();
       toast.success(
-        ` Invitaciones enviadas: ${r.invited?.length || 0} |  Fallidas: ${r.failed?.length || 0}`
+        ` Invitaciones enviadas: ${r.invited?.length || 0} |  Fallidas: ${r.failed?.length || 0}`,
       );
     } catch (e) {
-      toast.error(e.message || 'No se pudo invitar');
+      toast.error(e.message || "No se pudo invitar");
     } finally {
       setLoading(false);
     }
@@ -746,7 +761,7 @@ function ProjectsPanel() {
       toast.success(` Repositorio creado: ${r.repo?.full_name}`);
       await load();
     } catch (e) {
-      toast.error(e.message || 'No se pudo crear el repositorio');
+      toast.error(e.message || "No se pudo crear el repositorio");
     } finally {
       setLoading(false);
     }
@@ -755,15 +770,15 @@ function ProjectsPanel() {
   const onCopy = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('URL copiada al portapapeles');
+      toast.success("URL copiada al portapapeles");
     } catch {
-      toast.error('No se pudo copiar');
+      toast.error("No se pudo copiar");
     }
   };
 
   const onCreateProject = async () => {
-    if (!form.titulo.trim()) return toast.error('El título es obligatorio');
-    if (!form.materiaId) return toast.error('Selecciona una materia');
+    if (!form.titulo.trim()) return toast.error("El título es obligatorio");
+    if (!form.materiaId) return toast.error("Selecciona una materia");
 
     setLoading(true);
     try {
@@ -772,12 +787,17 @@ function ProjectsPanel() {
         tipoGrupo: form.tipoGrupo,
         materiaId: Number(form.materiaId),
       });
-      toast.success('Proyecto creado exitosamente');
-      setForm({ titulo: '', tipoGrupo: 'GROUP', materiaId: '', codigoMateria: '' });
+      toast.success("Proyecto creado exitosamente");
+      setForm({
+        titulo: "",
+        tipoGrupo: "GRUPAL",
+        materiaId: "",
+        codigoMateria: "",
+      });
       setShowCreate(false);
       await load();
     } catch (e) {
-      toast.error(e.message || 'No se pudo crear el proyecto');
+      toast.error(e.message || "No se pudo crear el proyecto");
     } finally {
       setLoading(false);
     }
@@ -793,16 +813,31 @@ function ProjectsPanel() {
 
           <Toolbar>
             <ButtonGroup>
-              <Btn Colors={Colors} $variant="success" onClick={onImport} disabled={loading}>
+              <Btn
+                Colors={Colors}
+                $variant="success"
+                onClick={onImport}
+                disabled={loading}
+              >
                 <Download size={18} />
                 Importar repositorios
               </Btn>
-              <Btn Colors={Colors} $variant="primary" onClick={onInviteAll} disabled={loading}>
+              <Btn
+                Colors={Colors}
+                $variant="primary"
+                onClick={onInviteAll}
+                disabled={loading}
+              >
                 <Users size={18} />
                 Invitar colaboradores
               </Btn>
-              <Btn Colors={Colors} $variant="neutral" onClick={load} disabled={loading}>
-                <RefreshCw size={18} className={loading ? 'rotating' : ''} />
+              <Btn
+                Colors={Colors}
+                $variant="neutral"
+                onClick={load}
+                disabled={loading}
+              >
+                <RefreshCw size={18} className={loading ? "rotating" : ""} />
                 Actualizar
               </Btn>
             </ButtonGroup>
@@ -829,43 +864,45 @@ function ProjectsPanel() {
           {showCreate && (
             <CreateSection>
               <CreateHeader>
-                <CreateTitle>
-                  Crear nuevo proyecto
-                </CreateTitle>
+                <CreateTitle>Crear nuevo proyecto</CreateTitle>
               </CreateHeader>
 
               <CreateForm>
                 <FormGroup>
-                  <FormLabel>
-                    Título del proyecto
-                  </FormLabel>
+                  <FormLabel>Título del proyecto</FormLabel>
                   <Input
                     Colors={Colors}
                     placeholder="Ej: Sistema de Gestión Académica"
                     value={form.titulo}
-                    onChange={(e) => setForm(s => ({ ...s, titulo: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((s) => ({ ...s, titulo: e.target.value }))
+                    }
                   />
                 </FormGroup>
 
                 <FormGroup>
-                  <FormLabel>
-                    Materia
-                  </FormLabel>
-                  <Select Colors={Colors} value={form.materiaId} onChange={onMateriaChange}>
+                  <FormLabel>Materia</FormLabel>
+                  <Select
+                    Colors={Colors}
+                    value={form.materiaId}
+                    onChange={onMateriaChange}
+                  >
                     <option value="">Seleccionar materia...</option>
                     {materias.map((m) => (
                       <option key={m.id} value={m.id}>
-                        {m.codigo ? `[${m.codigo}] ` : ''}
-                        {m.nombre} — {m.carrera?.nombre}
+                        {m.codigo ? `[${m.codigo}] ` : ""}
+                        {m.nombre}
+                        {m.carrera?.nombre ? ` — ${m.carrera.nombre}` : ""}
+                        {m.semestre?.numero
+                          ? ` — Semestre ${m.semestre.numero}`
+                          : ""}
                       </option>
                     ))}
                   </Select>
                 </FormGroup>
 
                 <FormGroup>
-                  <FormLabel>
-                    Código de materia
-                  </FormLabel>
+                  <FormLabel>Código de materia</FormLabel>
                   <Input
                     Colors={Colors}
                     placeholder="Se completa automáticamente"
@@ -875,21 +912,27 @@ function ProjectsPanel() {
                 </FormGroup>
 
                 <FormGroup>
-                  <FormLabel>
-                    Tipo de proyecto
-                  </FormLabel>
+                  <FormLabel>Tipo de proyecto</FormLabel>
                   <Select
                     Colors={Colors}
                     value={form.tipoGrupo}
-                    onChange={(e) => setForm(s => ({ ...s, tipoGrupo: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((s) => ({ ...s, tipoGrupo: e.target.value }))
+                    }
                   >
-                    <option value="GROUP"> Grupal</option>
-                    <option value="INDIVIDUAL"> Individual</option>
+                    <option value="GRUPAL">Grupal</option>
+                    <option value="INDIVIDUAL">Individual</option>
+                    <option value="COLABORATIVO">Colaborativo</option>
                   </Select>
                 </FormGroup>
 
-                <FormGroup style={{ alignSelf: 'flex-end' }}>
-                  <Btn Colors={Colors} $variant="primary" onClick={onCreateProject} disabled={loading}>
+                <FormGroup style={{ alignSelf: "flex-end" }}>
+                  <Btn
+                    Colors={Colors}
+                    $variant="primary"
+                    onClick={onCreateProject}
+                    disabled={loading}
+                  >
                     Crear proyecto
                   </Btn>
                 </FormGroup>
@@ -904,7 +947,7 @@ function ProjectsPanel() {
                 Mis proyectos
               </TableTitle>
               <Badge $type="neutral">
-                {items.length} {items.length === 1 ? 'proyecto' : 'proyectos'}
+                {items.length} {items.length === 1 ? "proyecto" : "proyectos"}
               </Badge>
             </TableHeader>
 
@@ -935,11 +978,17 @@ function ProjectsPanel() {
                         </ProjectTitle>
                       </Td>
                       <Td>
-                        <Badge $type="neutral">{p.codigoMateria || 'Sin código'}</Badge>
+                        <Badge $type="neutral">
+                          {p.codigoMateria || "Sin código"}
+                        </Badge>
                       </Td>
                       <Td>
-                        <Badge $type={p.tipoGrupo === 'GROUP' ? 'group' : 'individual'}>
-                          {p.tipoGrupo === 'GROUP' ? (
+                        <Badge
+                          $type={
+                            p.tipoGrupo === "GRUPAL" ? "grupal" : "individual"
+                          }
+                        >
+                          {p.tipoGrupo === "GRUPAL" ? (
                             <>
                               <Users size={12} />
                               Grupal
@@ -953,8 +1002,10 @@ function ProjectsPanel() {
                         </Badge>
                       </Td>
                       <Td>
-                        <Badge $type={p.rol === 'LEADER' ? 'leader' : 'neutral'}>
-                          {p.rol === 'LEADER' ? (
+                        <Badge
+                          $type={p.rol === "LEADER" ? "leader" : "neutral"}
+                        >
+                          {p.rol === "LEADER" ? (
                             <>
                               <Shield size={12} />
                               Líder
@@ -966,22 +1017,27 @@ function ProjectsPanel() {
                       </Td>
                       <Td>
                         {p.repoUrl ? (
-                          <RepoLink href={p.repoUrl} target="_blank" rel="noreferrer">
+                          <RepoLink
+                            href={p.repoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
                             <Github size={14} />
                             Ver en GitHub
                             <ExternalLink size={12} />
                           </RepoLink>
                         ) : (
-                          <Badge $type="neutral">
-                            Sin repositorio
-                          </Badge>
+                          <Badge $type="neutral">Sin repositorio</Badge>
                         )}
                       </Td>
                       <Td>
                         <ActionButtons>
                           {p.repoUrl ? (
                             // SOLO COPIAR CUANDO YA TIENE REPO
-                            <ActionBtn Colors={Colors} onClick={() => onCopy(p.repoUrl)}>
+                            <ActionBtn
+                              Colors={Colors}
+                              onClick={() => onCopy(p.repoUrl)}
+                            >
                               <Copy size={14} />
                               Copiar
                             </ActionBtn>
@@ -1011,9 +1067,14 @@ function ProjectsPanel() {
                   </EmptyIcon>
                   <EmptyTitle>Sin proyectos todavía</EmptyTitle>
                   <EmptyText>
-                    Crea tu primer proyecto para comenzar a colaborar con tu equipo
+                    Crea tu primer proyecto para comenzar a colaborar con tu
+                    equipo
                   </EmptyText>
-                  <Btn Colors={Colors} $variant="primary" onClick={() => setShowCreate(true)}>
+                  <Btn
+                    Colors={Colors}
+                    $variant="primary"
+                    onClick={() => setShowCreate(true)}
+                  >
                     <Plus size={18} />
                     Crear primer proyecto
                   </Btn>
@@ -1041,37 +1102,85 @@ const ProyectoUno = () => {
     inst: false,
     personal: false,
     app: false,
-    err: '',
+    err: "",
   });
 
   const cargar = async () => {
     try {
       const data = await api.overview();
-      const inst = (data.linkedGithub || []).some((a) => a.tipoCuenta === 'INSTITUTIONAL');
-      const per = (data.linkedGithub || []).some((a) => a.tipoCuenta === 'PERSONAL');
+      const inst = (data.linkedGithub || []).some(
+        (a) => a.tipoCuenta === "INSTITUCIONAL",
+      );
+      const per = (data.linkedGithub || []).some(
+        (a) => a.tipoCuenta === "PERSONAL",
+      );
       const app = (data.appInstallations || []).length > 0;
-      setState({ loading: false, inst, personal: per, app, err: '' });
+      setState({ loading: false, inst, personal: per, app, err: "" });
     } catch (e) {
-      setState((s) => ({ ...s, loading: false, err: e.message || 'Error' }));
+      setState((s) => ({ ...s, loading: false, err: e.message || "Error" }));
     }
   };
 
   useEffect(() => {
-    const q = new URLSearchParams(location.search);
-    const linkedOk = q.get('linked') === 'ok';
-    const linkedErr = q.get('linked_error');
-    const appOk = q.get('app_install') === 'ok';
-    const appErr = q.get('app_install_error');
+    const getCallbackParams = () => {
+      const normalParams = new URLSearchParams(window.location.search);
 
-    if (linkedOk) toast.success(' Cuenta de GitHub enlazada correctamente');
-    if (linkedErr) toast.error(decodeURIComponent(linkedErr || 'Error al enlazar'));
-    if (appOk) toast.success(' GitHub App instalada y vinculada');
-    if (appErr) toast.error(decodeURIComponent(appErr || 'Error al instalar App'));
+      const hash = window.location.hash || "";
+      const hashQueryIndex = hash.indexOf("?");
+
+      const hashParams =
+        hashQueryIndex >= 0
+          ? new URLSearchParams(hash.slice(hashQueryIndex + 1))
+          : new URLSearchParams();
+
+      return {
+        get: (key) => normalParams.get(key) ?? hashParams.get(key),
+        hasAny: () =>
+          normalParams.toString().length > 0 ||
+          hashParams.toString().length > 0,
+      };
+    };
+
+    const cleanCallbackParams = () => {
+      const hash = window.location.hash || "";
+      const cleanHash = hash.includes("?")
+        ? hash.slice(0, hash.indexOf("?"))
+        : hash;
+
+      window.history.replaceState(
+        {},
+        "",
+        `${window.location.origin}${window.location.pathname}${cleanHash}`,
+      );
+    };
+
+    const q = getCallbackParams();
+
+    const linkedOk = q.get("linked") === "ok";
+    const linkedErr = q.get("linked_error");
+    const appOk = q.get("app_install") === "ok";
+    const appErr = q.get("app_install_error");
+
+    if (linkedOk) {
+      toast.success("Cuenta de GitHub enlazada correctamente");
+    }
+
+    if (linkedErr) {
+      toast.error(linkedErr || "Error al enlazar");
+    }
+
+    if (appOk) {
+      toast.success("GitHub App instalada y vinculada");
+    }
+
+    if (appErr) {
+      toast.error(appErr || "Error al instalar App");
+    }
 
     if (linkedOk || linkedErr || appOk || appErr) {
-      const base = location.origin + location.pathname + location.hash;
-      history.replaceState({}, '', base);
+      cleanCallbackParams();
     }
+
     cargar();
   }, []);
 
@@ -1082,7 +1191,7 @@ const ProyectoUno = () => {
       const fail = r?.failed?.length || 0;
       toast.success(` Invitaciones OK: ${ok} |  Fallidas: ${fail}`);
     } catch (e) {
-      toast.error(e.message || 'No se pudieron enviar invitaciones');
+      toast.error(e.message || "No se pudieron enviar invitaciones");
     }
   };
 
@@ -1103,24 +1212,32 @@ const ProyectoUno = () => {
           <StatusGrid>
             <StatusCard $ok={state.inst}>
               <StatusIcon $ok={state.inst}>
-                {state.inst ? <CheckCircle2 size={24} /> : <Building size={24} />}
+                {state.inst ? (
+                  <CheckCircle2 size={24} />
+                ) : (
+                  <Building size={24} />
+                )}
               </StatusIcon>
               <StatusInfo>
                 <StatusLabel $ok={state.inst}>Cuenta Institucional</StatusLabel>
                 <StatusValue $ok={state.inst}>
-                  {state.inst ? 'Conectada' : 'No conectada'}
+                  {state.inst ? "Conectada" : "No conectada"}
                 </StatusValue>
               </StatusInfo>
             </StatusCard>
 
             <StatusCard $ok={state.personal}>
               <StatusIcon $ok={state.personal}>
-                {state.personal ? <CheckCircle2 size={24} /> : <User size={24} />}
+                {state.personal ? (
+                  <CheckCircle2 size={24} />
+                ) : (
+                  <User size={24} />
+                )}
               </StatusIcon>
               <StatusInfo>
                 <StatusLabel $ok={state.personal}>Cuenta Personal</StatusLabel>
                 <StatusValue $ok={state.personal}>
-                  {state.personal ? 'Conectada' : 'No conectada'}
+                  {state.personal ? "Conectada" : "No conectada"}
                 </StatusValue>
               </StatusInfo>
             </StatusCard>
@@ -1132,7 +1249,7 @@ const ProyectoUno = () => {
               <StatusInfo>
                 <StatusLabel $ok={state.app}>GitHub App</StatusLabel>
                 <StatusValue $ok={state.app}>
-                  {state.app ? 'Instalada' : 'No instalada'}
+                  {state.app ? "Instalada" : "No instalada"}
                 </StatusValue>
               </StatusInfo>
             </StatusCard>
@@ -1142,43 +1259,57 @@ const ProyectoUno = () => {
             <ButtonGroup>
               <Btn
                 Colors={Colors}
-                $variant={state.inst ? 'success' : 'primary'}
-                onClick={() => api.linkGithub('INSTITUTIONAL')}
+                $variant={state.inst ? "success" : "primary"}
+                onClick={() => api.linkGithub("INSTITUCIONAL")}
                 disabled={state.inst}
               >
                 <Building size={18} />
-                {state.inst ? 'Institucional conectada' : 'Conectar institucional'}
+                {state.inst
+                  ? "Institucional conectada"
+                  : "Conectar institucional"}
               </Btn>
 
               <Btn
                 Colors={Colors}
-                $variant={state.personal ? 'success' : 'primary'}
-                onClick={() => api.linkGithub('PERSONAL')}
+                $variant={state.personal ? "success" : "primary"}
+                onClick={() => api.linkGithub("PERSONAL")}
                 disabled={state.personal}
               >
                 <User size={18} />
-                {state.personal ? 'Personal conectada' : 'Conectar personal'}
+                {state.personal ? "Personal conectada" : "Conectar personal"}
               </Btn>
 
               <Btn
                 Colors={Colors}
-                $variant={state.app ? 'success' : 'primary'}
+                $variant={state.app ? "success" : "primary"}
                 onClick={api.installApp}
                 disabled={state.app}
               >
                 <Zap size={18} />
-                {state.app ? 'App instalada' : 'Instalar GitHub App'}
+                {state.app ? "App instalada" : "Instalar GitHub App"}
               </Btn>
             </ButtonGroup>
 
             <ButtonGroup>
-              <Btn Colors={Colors} $variant="neutral" onClick={cargar} disabled={state.loading}>
-                <RefreshCw size={18} className={state.loading ? 'rotating' : ''} />
+              <Btn
+                Colors={Colors}
+                $variant="neutral"
+                onClick={cargar}
+                disabled={state.loading}
+              >
+                <RefreshCw
+                  size={18}
+                  className={state.loading ? "rotating" : ""}
+                />
                 Actualizar estado
               </Btn>
 
               {state.inst && state.personal && state.app && (
-                <Btn Colors={Colors} $variant="neutral" onClick={handleRetryInvites}>
+                <Btn
+                  Colors={Colors}
+                  $variant="neutral"
+                  onClick={handleRetryInvites}
+                >
                   <Users size={18} />
                   Reintentar invitaciones
                 </Btn>
@@ -1192,22 +1323,26 @@ const ProyectoUno = () => {
               Instrucciones de configuración
             </HelpTitle>
             <HelpText>
-              Para completar la integración con GitHub, necesitas conectar tu cuenta institucional
-              usando tu correo <b>@unifranz.edu.bo</b> (debe estar verificado en GitHub),
-              tu cuenta personal de GitHub, y finalmente instalar la aplicación GitHub App
-              para habilitar todas las funcionalidades de colaboración.
+              Para completar la integración con GitHub, necesitas conectar tu
+              cuenta institucional usando tu correo <b>@unifranz.edu.bo</b>{" "}
+              (debe estar verificado en GitHub), tu cuenta personal de GitHub, y
+              finalmente instalar la aplicación GitHub App para habilitar todas
+              las funcionalidades de colaboración.
             </HelpText>
           </HelpSection>
 
           {state.err && (
-            <HelpSection style={{ background: 'linear-gradient(135deg, #fef2f2, #fee2e2)', borderColor: '#fca5a5' }}>
-              <HelpTitle style={{ color: '#991b1b' }}>
+            <HelpSection
+              style={{
+                background: "linear-gradient(135deg, #fef2f2, #fee2e2)",
+                borderColor: "#fca5a5",
+              }}
+            >
+              <HelpTitle style={{ color: "#991b1b" }}>
                 <XCircle size={16} />
                 Error de conexión
               </HelpTitle>
-              <HelpText style={{ color: '#7f1d1d' }}>
-                {state.err}
-              </HelpText>
+              <HelpText style={{ color: "#7f1d1d" }}>{state.err}</HelpText>
             </HelpSection>
           )}
         </Card>

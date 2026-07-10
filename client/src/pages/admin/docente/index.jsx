@@ -102,7 +102,7 @@ const Docentes = () => {
     try {
       setLoading(true);
       setErr("");
-      const u = new URL(`${BASE}/docente`);
+      const u = new URL(`${BASE}/api/docente`);
       if (q) u.searchParams.set("q", q);
       const r = await fetch(u, FETCH_OPTS);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -116,7 +116,7 @@ const Docentes = () => {
   }
 
   async function fetchDocenteById(id) {
-    const r = await fetch(`${BASE}/docente/${id}`, FETCH_OPTS);
+    const r = await fetch(`${BASE}/api/docente${id}`, FETCH_OPTS);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json(); // { data }
   }
@@ -124,12 +124,12 @@ const Docentes = () => {
   // ----- CRUD con toasts -----
   const handleCreate = async (payload) => {
     try {
-      const r = await fetch(`${BASE}/docente`, {
+      const r = await fetch(`${BASE}/api/docente`, {
         ...FETCH_OPTS, method: "POST", body: JSON.stringify(payload),
       });
       if (!r.ok) {
         const txt = await readText(r);
-        throw new Error(`POST /docente -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
+        throw new Error(`POST /api/docente -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
       }
       const j = await r.json();
       toast.success("Docente creado correctamente");
@@ -145,12 +145,12 @@ const Docentes = () => {
 
   const handleUpdate = async (id, actualizado) => {
     try {
-      const r = await fetch(`${BASE}/docente/${id}`, {
+      const r = await fetch(`${BASE}/api/docente/${id}`, {
         ...FETCH_OPTS, method: "PUT", body: JSON.stringify(actualizado),
       });
       if (!r.ok) {
         const txt = await readText(r);
-        throw new Error(`PUT /docente/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
+        throw new Error(`PUT /api/docente/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
       }
       toast.success("Docente actualizado");
       await loadDocentes(searchTerm); // Refresco lista para asegurar datos consistentes
@@ -167,10 +167,10 @@ const Docentes = () => {
     if (!confirm("¿Estás seguro de eliminar este docente?")) return;
     
     try {
-      const r = await fetch(`${BASE}/docente/${id}`, { ...FETCH_OPTS, method: "DELETE" });
+      const r = await fetch(`${BASE}/api/docente/${id}`, { ...FETCH_OPTS, method: "DELETE" });
       if (!r.ok) {
         const txt = await readText(r);
-        throw new Error(`DELETE /docente/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
+        throw new Error(`DELETE /api/docente/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
       }
       toast.success("Docente eliminado");
       await loadDocentes(searchTerm); // Recargar lista
@@ -182,13 +182,13 @@ const Docentes = () => {
 
   // catálogos
   async function loadFacultades() {
-    const r = await fetch(`${BASE}/facultad`, FETCH_OPTS);
+    const r = await fetch(`${BASE}/api/facultad`, FETCH_OPTS);
     const { data } = await r.json();
     setFacultades(data || []);
   }
   async function loadCarreras(fid) {
     if (!fid) return setCarreras([]);
-    const u = new URL(`${BASE}/carrera`);
+    const u = new URL(`${BASE}/api/carrera`);
     u.searchParams.set("idFacultad", String(fid));
     const r = await fetch(u, FETCH_OPTS);
     const { data } = await r.json();
@@ -196,7 +196,7 @@ const Docentes = () => {
   }
   async function loadMaterias(cid) {
     if (!cid) return setMaterias([]);
-    const u = new URL(`${BASE}/materia`);
+    const u = new URL(`${BASE}/api/materia`);
     u.searchParams.set("idCarrera", String(cid));
     const r = await fetch(u, FETCH_OPTS);
     const { data } = await r.json();

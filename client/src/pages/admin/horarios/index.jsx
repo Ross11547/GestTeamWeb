@@ -62,8 +62,8 @@ const HorariosCRUD = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const API = "http://localhost:3000/horario";
-    const API_MATERIA = "http://localhost:3000/materia";
+    const API = "http://localhost:3000/api/horario";
+    const API_MATERIA = "http://localhost:3000/api/materia";
 
     const readErrorMsg = async (res) => {
         try { const j = await res.json(); return j?.message || res.statusText; }

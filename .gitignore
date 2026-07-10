@@ -1,0 +1,12 @@
+﻿node_modules/
+dist/
+build/
+.env
+.env.*
+.cache/
+.codebase-memory/
+.vscode/
+.zed/
+.claude/
+.cursor/
+*.log

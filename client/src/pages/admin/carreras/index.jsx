@@ -40,8 +40,8 @@ const CarrerasCRUD = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const API = "http://localhost:3000/carrera";
-    const API_FAC = "http://localhost:3000/facultad";
+    const API = "http://localhost:3000/api/carrera";
+    const API_FAC = "http://localhost:3000/api/facultad";
 
     // Cargar carreras + facultades
     useEffect(() => {

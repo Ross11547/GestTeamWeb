@@ -60,7 +60,7 @@ const Dashboard = () => {
         setErr("");
 
         // 1) Resumen
-        const sRes = await fetch(`${BASE}/dashboard/summary`, BASE_FETCH);
+        const sRes = await fetch(`${BASE}/api/dashboard/summary`, BASE_FETCH);
         if (!sRes.ok) throw new Error(`HTTP ${sRes.status}`);
         const s = await sRes.json();
 
@@ -99,7 +99,7 @@ const Dashboard = () => {
         const yearTo = new Date().getFullYear();
         const yearFrom = yearTo - 5;
         const gRes = await fetch(
-          `${BASE}/dashboard/student-growth?from=${yearFrom}&to=${yearTo}`,
+          `${BASE}/api/dashboard/student-growth?from=${yearFrom}&to=${yearTo}`,
           BASE_FETCH
         );
         if (!gRes.ok) throw new Error(`HTTP ${gRes.status}`);

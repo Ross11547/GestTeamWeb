@@ -44,8 +44,8 @@ const GeneralInformacion = () => {
     const [carreras, setCarreras] = useState([]);
     const [search, setSearch] = useState("");
 
-    const API_MATERIA = "http://localhost:3000/materia";
-    const API_CARRERA = "http://localhost:3000/carrera";
+    const API_MATERIA = "http://localhost:3000/api/materia";
+    const API_CARRERA = "http://localhost:3000/api/carrera";
 
     useEffect(() => {
         (async () => {

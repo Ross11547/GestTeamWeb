@@ -37,7 +37,7 @@ const Facultades = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const API = "http://localhost:3000/facultad";
+  const API = "http://localhost:3000/api/facultad";
 
   // Carga inicial
   useEffect(() => {

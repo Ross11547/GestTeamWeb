@@ -68,13 +68,13 @@ export default function Estudiantes() {
   const readText = async (r) => { try { return await r.text(); } catch { return ""; } };
 
   async function loadFacultades() {
-    const r = await fetch(`${BASE}/facultad`, FETCH_OPTS);
+    const r = await fetch(`${BASE}/api/facultad`, FETCH_OPTS);
     const { data = [] } = await r.json();
     setFacultades(data);
   }
   async function loadCarreras(fid) {
     if (!fid) { setCarreras([]); return; }
-    const u = new URL(`${BASE}/carrera`);
+    const u = new URL(`${BASE}/api/carrera`);
     u.searchParams.set("idFacultad", String(fid));
     const r = await fetch(u, FETCH_OPTS);
     const { data = [] } = await r.json();
@@ -82,7 +82,7 @@ export default function Estudiantes() {
   }
   async function loadSemestresByCarrera(cid) {
     if (!cid) { setSemestres([]); return; }
-    const u = new URL(`${BASE}/semestre/by-carrera`);
+    const u = new URL(`${BASE}/api/semestre/by-carrera`);
     u.searchParams.set("carreraId", String(cid));
     const r = await fetch(u, FETCH_OPTS);
     const j = await r.json();
@@ -92,7 +92,7 @@ export default function Estudiantes() {
   async function loadMateriasBySemestre(semestreId, carreraIdCurrent = form.idCarrera) {
     try {
       if (!semestreId) { setMaterias([]); return; }
-      const u = new URL(`${BASE}/materia/by-semestre`);
+      const u = new URL(`${BASE}/api/materia/by-semestre`);
       u.searchParams.set("semestreId", String(semestreId));
       const r = await fetch(u, FETCH_OPTS);
       const j = await r.json();
@@ -101,7 +101,7 @@ export default function Estudiantes() {
         setMaterias(items); return;
       }
       if (carreraIdCurrent) {
-        const u2 = new URL(`${BASE}/materia`);
+        const u2 = new URL(`${BASE}/api/materia`);
         u2.searchParams.set("idCarrera", String(carreraIdCurrent));
         const r2 = await fetch(u2, FETCH_OPTS);
         const j2 = await r2.json();
@@ -117,10 +117,10 @@ export default function Estudiantes() {
     try {
       setLoading(true);
       setErr("");
-      const u = new URL(`${BASE}/estudiante`);
+      const u = new URL(`${BASE}/api/estudiante`);
       if (q) u.searchParams.set("q", q);
       const r = await fetch(u, FETCH_OPTS);
-      if (!r.ok) { const t = await readText(r); throw new Error(`GET /estudiante -> ${r.status} ${t}`); }
+      if (!r.ok) { const t = await readText(r); throw new Error(`GET /api/estudiante -> ${r.status} ${t}`); }
       const { data = [] } = await r.json();
       setRows(data);
     } catch (e) {
@@ -130,18 +130,18 @@ export default function Estudiantes() {
     }
   }
   async function createEstudiante(payload) {
-    const r = await fetch(`${BASE}/estudiante`, { ...FETCH_OPTS, method: "POST", body: JSON.stringify(payload) });
-    if (!r.ok) { const t = await readText(r); throw new Error(`POST /estudiante -> ${r.status} ${t}`); }
+    const r = await fetch(`${BASE}/api/estudiante`, { ...FETCH_OPTS, method: "POST", body: JSON.stringify(payload) });
+    if (!r.ok) { const t = await readText(r); throw new Error(`POST /api/estudiante -> ${r.status} ${t}`); }
     return r.json();
   }
   async function updateEstudiante(id, payload) {
-    const r = await fetch(`${BASE}/estudiante/${id}`, { ...FETCH_OPTS, method: "PUT", body: JSON.stringify(payload) });
-    if (!r.ok) { const t = await readText(r); throw new Error(`PUT /estudiante/${id} -> ${r.status} ${t}`); }
+    const r = await fetch(`${BASE}/api/estudiante/${id}`, { ...FETCH_OPTS, method: "PUT", body: JSON.stringify(payload) });
+    if (!r.ok) { const t = await readText(r); throw new Error(`PUT /api/estudiante/${id} -> ${r.status} ${t}`); }
     return r.json();
   }
   async function deleteEstudiante(id) {
-    const r = await fetch(`${BASE}/estudiante/${id}`, { ...FETCH_OPTS, method: "DELETE" });
-    if (!r.ok) { const t = await readText(r); throw new Error(`DELETE /estudiante/${id} -> ${r.status} ${t}`); }
+    const r = await fetch(`${BASE}/api/estudiante/${id}`, { ...FETCH_OPTS, method: "DELETE" });
+    if (!r.ok) { const t = await readText(r); throw new Error(`DELETE /api/estudiante/${id} -> ${r.status} ${t}`); }
     return r.json();
   }
 
@@ -223,7 +223,7 @@ export default function Estudiantes() {
 
   const openEdit = async (row) => {
     try {
-      const r = await fetch(`${BASE}/estudiante/${row.id}`, FETCH_OPTS);
+      const r = await fetch(`${BASE}/api/estudiante/${row.id}`, FETCH_OPTS);
       const { data } = await r.json();
       setEditingId(row.id);
       const fid = data.raw?.idFacultad || "";

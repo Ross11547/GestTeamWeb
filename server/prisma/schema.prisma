@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -8,14 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//======== ENUMS ========
+
 enum TipoCuentaGithub {
-  INSTITUTIONAL
+  INSTITUCIONAL
   PERSONAL
 }
 
 enum TipoGrupo {
   INDIVIDUAL
-  GROUP
+  GRUPAL
+  COLABORATIVO
 }
 
 enum DiaSemana {
@@ -28,32 +30,173 @@ enum DiaSemana {
   DOMINGO
 }
 
+enum EstadoProyecto {
+  BORRADOR
+  ACTIVO
+  CERRADO
+  ARCHIVADO
+}
+
+enum EstadoEntrega {
+  BORRADOR
+  ENTREGADO
+  REVISADO
+  DEVUELTO
+  ATRASADO
+}
+
+enum TipoDocumento {
+  INFORME
+  PRESENTACION
+  GUIA
+  EVIDENCIA
+  OTRO
+}
+
+enum TipoAnalisis {
+  DOCUMENTO
+  CODIGO
+}
+
+enum RolMiembroEquipo {
+  LIDER
+  MIEMBRO
+  COLABORADOR
+}
+
+enum TipoEvaluadorProyecto {
+  DOCENTE
+  DIRECTOR
+  ADMIN
+  JURADO
+}
+
+enum EstadoSolicitudAcceso {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  EXPIRADA
+}
+
+enum TipoRecursoAcceso {
+  DOCUMENTOS
+  CODIGO
+  AMBOS
+}
+
+enum TipoReporte {
+  DASHBOARD
+  AVANCESEMESTRE
+  TOPPROYECTOS
+  PLAGIORESUMEN
+  DOCENTESDESEMPENO
+}
+
+enum RolColaboradorPizarra {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+//======== INSTITUCION ========
+
+model Institucion {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  slug      String   @unique
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  facultades Facultad[]
+  periodos   PeriodoAcademico[]
+  ferias     Feria[]
+}
+
+model PeriodoAcademico {
+  id            Int         @id @default(autoincrement())
+  institucionId Int
+  institucion   Institucion @relation(fields: [institucionId], references: [id])
+
+  nombre    String // "2026-1"
+  fechaIni  DateTime
+  fechaFin  DateTime
+  activo    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clases              ClaseMateria[]
+  proyectos           ProyectoMateria[]
+  inscripciones       InscripcionMateria[]
+  equipos             Equipo[]
+  evaluacionProyectos EvaluacionProyecto[]
+  proyectoDestacados  ProyectoDestacado[]
+  reporteGenerados    ReporteGenerado[]
+  pizarras            Pizarra[]
+
+  @@unique([institucionId, nombre])
+  @@index([institucionId, activo])
+}
+
+//======== USUARIOS & ROLES ========
+
 model Usuario {
-  id                 Int                 @id @default(autoincrement())
-  nombre             String
-  apellido           String
-  telefono           String
-  ci                 Int
-  correo             String              @unique
-  password           String
-  idRol              Int
-  activo             Boolean
-  rol                Rol                 @relation(fields: [idRol], references: [id])
-  githubAuth         GithubAuth[]
-  instalaciones      InstGithubApp[]
-  membresias         MiembroProyecto[]
-  GithubLinkPair     GithubLinkPair?
-  codigo             String?             @unique
-  idFacultad         Int?
-  facultad           Facultad?           @relation(fields: [idFacultad], references: [id])
-  idCarrera          Int?
-  carrera            Carrera?            @relation(fields: [idCarrera], references: [id])
-  semestreId         Int?
-  semestre           Semestre?           @relation(fields: [semestreId], references: [id])
-  esDirector         Boolean             @default(false)
+  id             Int             @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  telefono       String
+  ci             Int
+  correo         String          @unique
+  password       String
+  idRol          Int
+  activo         Boolean
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  rol            Rol             @relation(fields: [idRol], references: [id])
+  codigo         String?         @unique
+  idFacultad     Int?
+  facultad       Facultad?       @relation(fields: [idFacultad], references: [id])
+  idCarrera      Int?
+  carrera        Carrera?        @relation(fields: [idCarrera], references: [id])
+  semestreId     Int?
+  semestre       Semestre?       @relation(fields: [semestreId], references: [id])
+  esDirector     Boolean         @default(false)
+  githubAuth     GithubAuth[]
+  instalaciones  InstGithubApp[]
+  GithubLinkPair GithubLinkPair?
+
   inscripciones      Inscripcion[]
   docenteMaterias    DocenteMateria[]
   estudianteMaterias EstudianteMateria[]
+
+  inscripcionesMateria InscripcionMateria[]
+  clasesDocente        ClaseMateria[]       @relation("DocenteClase")
+
+  membresias     MiembroProyecto[]
+  equipos        EquipoMiembro[]
+  equiposCreados Equipo[]          @relation("EquipoCreador")
+  entregas       EntregaHito[]     @relation("AutorEntrega")
+  revisiones     RevisionEntrega[] @relation("RevisorEntrega")
+
+  documentos Documento[]
+
+  cv                               CV?
+  feriaEquipos                     FeriaEquipoMiembro[]
+  feriaEvaluacions                 FeriaEvaluacion[]
+  evaluacionProyectos              EvaluacionProyecto[]
+  reporteGenerados                 ReporteGenerado[]
+  solicitudesAccesoComoSolicitante SolicitudAccesoProyecto[] @relation("SolicitudSolicitante")
+  solicitudesAccesoComoAprobador   SolicitudAccesoProyecto[] @relation("SolicitudAprobador")
+  solicitudAccesoProyectos         SolicitudAccesoProyecto[]
+  pizarrasCreadas                  Pizarra[]
+  pizarrasColaborando              PizarraColaborador[]
+  pizarrasColabAgregado            PizarraColaborador[]      @relation("PizarraColabAgregadoPor")
+
+  @@index([idRol])
+  @@index([idFacultad])
+  @@index([idCarrera])
+  @@index([semestreId])
+  @@index([createdAt])
 }
 
 model Rol {
@@ -62,24 +205,38 @@ model Rol {
   Usuario Usuario[]
 }
 
+// ======== ACADEMICO ========
+
 model Facultad {
-  id      Int       @id @default(autoincrement())
-  nombre  String
-  theme   Json?
-  Carrera Carrera[]
-  Usuario Usuario[]
+  id                 Int                 @id @default(autoincrement())
+  institucionId      Int?
+  institucion        Institucion?        @relation(fields: [institucionId], references: [id])
+  nombre             String
+  theme              Json?
+  Carrera            Carrera[]
+  Usuario            Usuario[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  proyectoDestacados ProyectoDestacado[]
+
+  @@unique([institucionId, nombre])
+  @@index([institucionId])
 }
 
 model Carrera {
-  id         Int        @id @default(autoincrement())
-  nombre     String
-  idFacultad Int
-  facultad   Facultad   @relation(fields: [idFacultad], references: [id])
-  Materia    Materia[]
-  semestres  Semestre[]
-  Usuario    Usuario[]
+  id                 Int                 @id @default(autoincrement())
+  nombre             String
+  idFacultad         Int
+  facultad           Facultad            @relation(fields: [idFacultad], references: [id])
+  Materia            Materia[]
+  semestres          Semestre[]
+  Usuario            Usuario[]
+  sigla              String?             @unique
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  proyectoDestacados ProyectoDestacado[]
 
-  sigla String? @unique
+  @@index([idFacultad])
 }
 
 model Semestre {
@@ -90,24 +247,34 @@ model Semestre {
   carrera   Carrera   @relation(fields: [carreraId], references: [id])
   materias  Materia[]
   Usuario   Usuario[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@unique([carreraId, numero])
+  @@index([carreraId, numero])
 }
 
 model Materia {
-  id        Int     @id @default(autoincrement())
-  nombre    String
-  codigo    String  @unique
-  idCarrera Int
-  carrera   Carrera @relation(fields: [idCarrera], references: [id])
+  id                  Int                  @id @default(autoincrement())
+  nombre              String
+  codigo              String               @unique
+  idCarrera           Int
+  carrera             Carrera              @relation(fields: [idCarrera], references: [id])
+  semestreId          Int?
+  semestre            Semestre?            @relation(fields: [semestreId], references: [id])
+  horarios            Horario[]
+  docentes            DocenteMateria[]
+  inscripciones       Inscripcion[]
+  EstudianteMateria   EstudianteMateria[]
+  clases              ClaseMateria[]
+  proyectosMateria    ProyectoMateria[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  inscripcionMaterias InscripcionMateria[]
+  equipos             Equipo[]
 
-  semestreId Int?
-  semestre   Semestre? @relation(fields: [semestreId], references: [id])
-
-  horarios          Horario[]
-  docentes          DocenteMateria[]
-  inscripciones     Inscripcion[]
-  EstudianteMateria EstudianteMateria[]
+  @@index([idCarrera])
+  @@index([semestreId])
 }
 
 model Horario {
@@ -118,18 +285,63 @@ model Horario {
   horaInicio DateTime
   horaFin    DateTime
   aula       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@index([materiaId, dia])
 }
 
+model ClaseMateria {
+  id         Int              @id @default(autoincrement())
+  periodoId  Int
+  periodo    PeriodoAcademico @relation(fields: [periodoId], references: [id])
+  materiaId  Int
+  materia    Materia          @relation(fields: [materiaId], references: [id])
+  docenteId  Int?
+  docente    Usuario?         @relation("DocenteClase", fields: [docenteId], references: [id])
+  paralelo   String           @default("A")
+  aula       String?
+  cupoMaximo Int              @default(30)
+  activo     Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  inscripciones InscripcionMateria[]
+  proyectos     ProyectoMateria[]
+  equipos       Equipo[]
+
+  @@unique([periodoId, materiaId, paralelo])
+  @@index([periodoId])
+  @@index([materiaId])
+  @@index([docenteId])
+  @@index([activo])
+}
+
+model InscripcionMateria {
+  id Int @id @default(autoincrement())
+
+  usuarioId Int
+  usuario   Usuario          @relation(fields: [usuarioId], references: [id])
+  periodoId Int
+  periodo   PeriodoAcademico @relation(fields: [periodoId], references: [id])
+  claseId   Int?
+  clase     ClaseMateria?    @relation(fields: [claseId], references: [id])
+  materiaId Int
+  materia   Materia          @relation(fields: [materiaId], references: [id])
+  createdAt DateTime         @default(now())
+
+  @@unique([usuarioId, periodoId, materiaId])
+  @@index([periodoId, materiaId])
+  @@index([claseId])
+  @@index([usuarioId])
+}
+
 model Inscripcion {
-  id        Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   usuarioId Int
   materiaId Int
-
-  usuario Usuario @relation(fields: [usuarioId], references: [id])
-  materia Materia @relation(fields: [materiaId], references: [id])
-
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  materia   Materia  @relation(fields: [materiaId], references: [id])
   createdAt DateTime @default(now())
 
   @@unique([usuarioId, materiaId])
@@ -155,45 +367,319 @@ model EstudianteMateria {
   @@unique([usuarioId, materiaId])
 }
 
-/**
- * ===================== DOCUMENTOS & PLAGIO =====================
- */
+//======== PROYECTOS, EQUIPOS, HITOS, ENTREGAS ========
+model Proyecto {
+  id            Int            @id @default(autoincrement())
+  titulo        String
+  descripcion   String?        @default("")
+  codigoMateria String?
+  tipoGrupo     TipoGrupo      @default(GRUPAL)
+  estado        EstadoProyecto @default(ACTIVO)
+  repoUrl       String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  miembros                 MiembroProyecto[]
+  hitos                    HitoProyecto[]
+  proyectosMateria         ProyectoMateria[]
+  equipos                  Equipo[]
+  evaluacionProyectos      EvaluacionProyecto[]
+  proyectoDestacado        ProyectoDestacado?
+  solicitudAccesoProyectos SolicitudAccesoProyecto[]
+  pizarras                 Pizarra[]
+}
+
+model ProyectoMateria {
+  id         Int               @id @default(autoincrement())
+  proyectoId Int
+  proyecto   Proyecto          @relation(fields: [proyectoId], references: [id])
+  materiaId  Int
+  materia    Materia           @relation(fields: [materiaId], references: [id])
+  periodoId  Int?
+  periodo    PeriodoAcademico? @relation(fields: [periodoId], references: [id])
+  claseId    Int?
+  clase      ClaseMateria?     @relation(fields: [claseId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([proyectoId, materiaId, periodoId])
+  @@index([materiaId, periodoId])
+  @@index([claseId])
+}
+
+model Equipo {
+  id          Int               @id @default(autoincrement())
+  proyectoId  Int
+  proyecto    Proyecto          @relation(fields: [proyectoId], references: [id])
+  nombre      String
+  tipoGrupo   TipoGrupo         @default(GRUPAL)
+  materiaId   Int?
+  materia     Materia?          @relation(fields: [materiaId], references: [id])
+  periodoId   Int?
+  periodo     PeriodoAcademico? @relation(fields: [periodoId], references: [id])
+  claseId     Int?
+  clase       ClaseMateria?     @relation(fields: [claseId], references: [id])
+  creadoPorId Int?
+  creadoPor   Usuario?          @relation("EquipoCreador", fields: [creadoPorId], references: [id])
+
+  repoVinculado RepoGithub?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  miembros     EquipoMiembro[]
+  entregas     EntregaHito[]
+  feriaEquipos FeriaEquipo[]
+  pizarras     Pizarra[]
+
+  @@index([proyectoId])
+  @@index([materiaId, periodoId])
+  @@index([claseId])
+  @@index([creadoPorId])
+}
+
+model EquipoMiembro {
+  id Int @id @default(autoincrement())
+
+  equipoId  Int
+  equipo    Equipo           @relation(fields: [equipoId], references: [id])
+  usuarioId Int
+  usuario   Usuario          @relation(fields: [usuarioId], references: [id])
+  rolEquipo RolMiembroEquipo @default(MIEMBRO)
+  activo    Boolean          @default(true)
+  joinedAt  DateTime         @default(now())
+
+  @@unique([equipoId, usuarioId])
+  @@index([usuarioId])
+}
+
+model HitoProyecto {
+  id          Int           @id @default(autoincrement())
+  proyectoId  Int
+  proyecto    Proyecto      @relation(fields: [proyectoId], references: [id])
+  orden       Int
+  nombre      String
+  descripcion String?       @default("")
+  peso        Int?
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  estado      String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  entregas    EntregaHito[]
+
+  @@unique([proyectoId, orden])
+  @@index([proyectoId])
+}
+
+model EntregaHito {
+  id           Int           @id @default(autoincrement())
+  hitoId       Int
+  hito         HitoProyecto  @relation(fields: [hitoId], references: [id])
+  equipoId     Int
+  equipo       Equipo        @relation(fields: [equipoId], references: [id])
+  autorId      Int?
+  autor        Usuario?      @relation("AutorEntrega", fields: [autorId], references: [id])
+  estado       EstadoEntrega @default(ENTREGADO)
+  comentario   String?       @default("")
+  evidenciaUrl String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  documentos Documento[]
+  revisiones RevisionEntrega[]
+  analisis   AnalisisPlagio[]
+
+  @@index([hitoId])
+  @@index([equipoId])
+  @@index([createdAt])
+}
+
+model RevisionEntrega {
+  id        Int         @id @default(autoincrement())
+  entregaId Int
+  entrega   EntregaHito @relation(fields: [entregaId], references: [id])
+  revisorId Int
+  revisor   Usuario     @relation("RevisorEntrega", fields: [revisorId], references: [id])
+  nota      Float?
+  feedback  String?     @default("")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([entregaId])
+  @@index([revisorId])
+}
+
+model MiembroProyecto {
+  id         Int      @id @default(autoincrement())
+  proyectoId Int
+  usuarioId  Int
+  rol        String
+  proyecto   Proyecto @relation(fields: [proyectoId], references: [id])
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  joinedAt   DateTime @default(now())
+
+  @@unique([proyectoId, usuarioId])
+}
+
+model EvaluacionProyecto {
+  id            Int                   @id @default(autoincrement())
+  proyectoId    Int
+  proyecto      Proyecto              @relation(fields: [proyectoId], references: [id])
+  periodoId     Int?
+  periodo       PeriodoAcademico?     @relation(fields: [periodoId], references: [id])
+  evaluadorId   Int
+  evaluador     Usuario               @relation(fields: [evaluadorId], references: [id])
+  tipoEvaluador TipoEvaluadorProyecto
+  puntaje       Float
+  comentario    String?               @default("")
+  criteriosJson Json?
+  createdAt     DateTime              @default(now())
+
+  @@index([proyectoId])
+  @@index([periodoId])
+  @@index([evaluadorId])
+}
+
+model ProyectoDestacado {
+  id         Int               @id @default(autoincrement())
+  proyectoId Int               @unique
+  proyecto   Proyecto          @relation(fields: [proyectoId], references: [id])
+  periodoId  Int?
+  periodo    PeriodoAcademico? @relation(fields: [periodoId], references: [id])
+  idFacultad Int?
+  facultad   Facultad?         @relation(fields: [idFacultad], references: [id])
+  idCarrera  Int?
+  carrera    Carrera?          @relation(fields: [idCarrera], references: [id])
+  motivo     String?           @default("")
+  orden      Int?
+  createdAt  DateTime          @default(now())
+
+  @@index([periodoId])
+  @@index([idFacultad])
+  @@index([idCarrera])
+}
+
+model SolicitudAccesoProyecto {
+  id            Int                   @id @default(autoincrement())
+  proyectoId    Int
+  proyecto      Proyecto              @relation(fields: [proyectoId], references: [id])
+  solicitanteId Int
+  solicitante   Usuario               @relation("SolicitudSolicitante", fields: [solicitanteId], references: [id])
+  aprobadorId   Int?
+  aprobador     Usuario?              @relation("SolicitudAprobador", fields: [aprobadorId], references: [id])
+  estado        EstadoSolicitudAcceso @default(PENDIENTE)
+  tipo          TipoRecursoAcceso     @default(AMBOS)
+  motivo        String?               @default("")
+  respuesta     String?               @default("")
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  expiresAt     DateTime?
+  usuario       Usuario?              @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int?
+
+  @@index([proyectoId])
+  @@index([solicitanteId])
+  @@index([aprobadorId])
+  @@index([estado])
+}
+
+//======== PIZARRAS (EXCALIDRAW) ========
+
+model Pizarra {
+  id          Int               @id @default(autoincrement())
+  proyectoId  Int
+  proyecto    Proyecto          @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  equipoId    Int?
+  equipo      Equipo?           @relation(fields: [equipoId], references: [id], onDelete: SetNull)
+  periodoId   Int?
+  periodo     PeriodoAcademico? @relation(fields: [periodoId], references: [id], onDelete: SetNull)
+  nombre      String
+  dataJson    Json
+  version     Int               @default(1)
+  creadoPorId Int
+  creadoPor   Usuario           @relation(fields: [creadoPorId], references: [id], onDelete: Restrict)
+  esPublica   Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  colaboradores PizarraColaborador[]
+
+  @@index([proyectoId])
+  @@index([equipoId])
+  @@index([periodoId])
+  @@index([creadoPorId])
+  @@index([createdAt])
+}
+
+model PizarraColaborador {
+  id            Int                   @id @default(autoincrement())
+  pizarraId     Int
+  pizarra       Pizarra               @relation(fields: [pizarraId], references: [id], onDelete: Cascade)
+  usuarioId     Int
+  usuario       Usuario               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  rol           RolColaboradorPizarra @default(EDITOR)
+  agregadoPorId Int?
+  agregadoPor   Usuario?              @relation("PizarraColabAgregadoPor", fields: [agregadoPorId], references: [id], onDelete: SetNull)
+
+  joinedAt DateTime @default(now())
+
+  @@unique([pizarraId, usuarioId])
+  @@index([usuarioId])
+  @@index([pizarraId])
+}
+
+//======== DOCUMENTOS & PLAGIO ========
 
 model Documento {
-  id                    Int      @id @default(autoincrement())
+  id                    Int           @id @default(autoincrement())
   nombre                String
   ruta                  String
   mimetype              String
   tamano                Int
-  creadoEn              DateTime @default(now())
+  creadoEn              DateTime      @default(now())
+  tipo                  TipoDocumento @default(OTRO)
   contenidoTexto        String?
-  esRepositorioUnifranz Boolean  @default(false)
+  esRepositorioUnifranz Boolean       @default(false)
+  usuarioId             Int?
+  usuario               Usuario?      @relation(fields: [usuarioId], references: [id])
+  entregaId             Int?
+  entrega               EntregaHito?  @relation(fields: [entregaId], references: [id])
 
   analisis AnalisisPlagio[]
+
+  @@index([usuarioId])
+  @@index([entregaId])
+  @@index([creadoEn])
 }
 
 model AnalisisPlagio {
-  id          Int       @id @default(autoincrement())
-  documentoId Int
-  documento   Documento @relation(fields: [documentoId], references: [id])
-
+  id                Int          @id @default(autoincrement())
+  tipo              TipoAnalisis @default(DOCUMENTO)
+  documentoId       Int?
+  documento         Documento?   @relation(fields: [documentoId], references: [id])
+  entregaId         Int?
+  entrega           EntregaHito? @relation(fields: [entregaId], references: [id])
   originalidad      Float
   plagioWeb         Float
   plagioUniversidad Float
   contenidoIA       Float
   nivelRiesgo       String
   resumenJson       Json?
-  creadoEn          DateTime @default(now())
+  creadoEn          DateTime     @default(now())
 
   fuentes    FuentePlagio[]
   fragmentos FragmentoPlagio[]
+
+  @@index([documentoId])
+  @@index([entregaId])
+  @@index([creadoEn])
 }
 
 model FuentePlagio {
-  id         Int            @id @default(autoincrement())
-  analisisId Int
-  analisis   AnalisisPlagio @relation(fields: [analisisId], references: [id])
-
+  id           Int            @id @default(autoincrement())
+  analisisId   Int
+  analisis     AnalisisPlagio @relation(fields: [analisisId], references: [id])
   tipo         String
   titulo       String
   autor        String?
@@ -202,10 +688,9 @@ model FuentePlagio {
 }
 
 model FragmentoPlagio {
-  id         Int            @id @default(autoincrement())
-  analisisId Int
-  analisis   AnalisisPlagio @relation(fields: [analisisId], references: [id])
-
+  id          Int            @id @default(autoincrement())
+  analisisId  Int
+  analisis    AnalisisPlagio @relation(fields: [analisisId], references: [id])
   inicio      Int
   fin         Int
   texto       String
@@ -213,16 +698,14 @@ model FragmentoPlagio {
   fuenteLabel String?
 }
 
-/**
- * ===================== GITHUB & PROYECTOS =====================
- */
+//======== GITHUB ========
 
 model GithubAuth {
   id          Int              @id @default(autoincrement())
   usuarioId   Int
   usuario     Usuario          @relation(fields: [usuarioId], references: [id])
   tipoCuenta  TipoCuentaGithub
-  githubId    Int
+  githubId    String
   login       String
   avatarUrl   String?
   correo      String?
@@ -233,7 +716,6 @@ model GithubAuth {
   updatedAt   DateTime         @updatedAt
 
   @@unique([usuarioId, tipoCuenta])
-  @@unique([githubId, tipoCuenta])
 }
 
 model InstGithubApp {
@@ -249,10 +731,10 @@ model InstGithubApp {
 model GithubLinkPair {
   id           Int      @id @default(autoincrement())
   usuarioId    Int      @unique
-  instGithubId Int?
+  instGithubId String?
   instLogin    String?
   instEmail    String?
-  perGithubId  Int?
+  perGithubId  String?
   perLogin     String?
   perEmail     String?
   createdAt    DateTime @default(now())
@@ -261,40 +743,185 @@ model GithubLinkPair {
   user Usuario @relation(fields: [usuarioId], references: [id])
 }
 
-model Proyecto {
-  id            Int               @id @default(autoincrement())
-  titulo        String
-  codigoMateria String?
-  tipoGrupo     TipoGrupo         @default(GROUP)
-  repoUrl       String?
-  miembros      MiembroProyecto[]
-  hitos         HitoProyecto[]
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+model RepoGithub {
+  id        Int      @id @default(autoincrement())
+  equipoId  Int      @unique
+  equipo    Equipo   @relation(fields: [equipoId], references: [id])
+  owner     String
+  name      String
+  url       String
+  private   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  snapshots RepoSnapshot[]
+
+  @@unique([owner, name])
 }
 
-model HitoProyecto {
-  id          Int       @id @default(autoincrement())
-  proyectoId  Int
-  proyecto    Proyecto  @relation(fields: [proyectoId], references: [id])
-  orden       Int
+model RepoSnapshot {
+  id      Int        @id @default(autoincrement())
+  repoId  Int
+  repo    RepoGithub @relation(fields: [repoId], references: [id])
+  fecha   DateTime   @default(now())
+  commits Int        @default(0)
+  prs     Int        @default(0)
+  issues  Int        @default(0)
+
+  resumenJson Json?
+
+  @@index([repoId, fecha])
+}
+
+//======== FERIAS ========
+
+model Feria {
+  id Int @id @default(autoincrement())
+
+  institucionId Int?
+  institucion   Institucion? @relation(fields: [institucionId], references: [id])
+
+  nombre        String
+  descripcion   String?  @default("")
+  fecha         DateTime
+  lugar         String?  @default("")
+  imagenMapaUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  categorias FeriaCategoria[]
+  equipos    FeriaEquipo[]
+
+  @@index([fecha])
+}
+
+model FeriaCategoria {
+  id          Int           @id @default(autoincrement())
+  feriaId     Int
+  feria       Feria         @relation(fields: [feriaId], references: [id])
   nombre      String
-  peso        Int?
-  fechaInicio DateTime?
-  fechaFin    DateTime?
-  estado      String?
+  descripcion String?       @default("")
+  createdAt   DateTime      @default(now())
+  equipos     FeriaEquipo[]
 
-  @@unique([proyectoId, orden])
+  @@unique([feriaId, nombre])
 }
 
-model MiembroProyecto {
-  id         Int      @id @default(autoincrement())
-  proyectoId Int
-  usuarioId  Int
-  rol        String
-  proyecto   Proyecto @relation(fields: [proyectoId], references: [id])
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
-  joinedAt   DateTime @default(now())
+model FeriaEquipo {
+  id             Int             @id @default(autoincrement())
+  feriaId        Int
+  feria          Feria           @relation(fields: [feriaId], references: [id])
+  categoriaId    Int?
+  categoria      FeriaCategoria? @relation(fields: [categoriaId], references: [id])
+  equipoId       Int?
+  equipo         Equipo?         @relation(fields: [equipoId], references: [id])
+  nombreEquipo   String
+  nombreProyecto String
+  descripcion    String?         @default("")
+  mesaCodigo     String?
+  mesaX          Int?
+  mesaY          Int?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
-  @@unique([proyectoId, usuarioId])
+  miembros     FeriaEquipoMiembro[]
+  evaluaciones FeriaEvaluacion[]
+
+  @@index([feriaId, categoriaId])
+}
+
+model FeriaEquipoMiembro {
+  id            Int         @id @default(autoincrement())
+  feriaEquipoId Int
+  feriaEquipo   FeriaEquipo @relation(fields: [feriaEquipoId], references: [id])
+  usuarioId     Int
+  usuario       Usuario     @relation(fields: [usuarioId], references: [id])
+
+  @@unique([feriaEquipoId, usuarioId])
+  @@index([usuarioId])
+}
+
+model FeriaEvaluacion {
+  id            Int         @id @default(autoincrement())
+  feriaEquipoId Int
+  feriaEquipo   FeriaEquipo @relation(fields: [feriaEquipoId], references: [id])
+  juradoId      Int
+  jurado        Usuario     @relation(fields: [juradoId], references: [id])
+  puntaje       Float
+  comentario    String?     @default("")
+  createdAt     DateTime    @default(now())
+
+  @@index([feriaEquipoId])
+  @@index([juradoId])
+}
+
+//======== CV ========
+
+model CV {
+  id          Int           @id @default(autoincrement())
+  usuarioId   Int           @unique
+  usuario     Usuario       @relation(fields: [usuarioId], references: [id])
+  resumen     String?       @default("")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  habilidades CVHabilidad[]
+  logros      CVLogro[]
+  proyectos   CVProyecto[]
+}
+
+model CVHabilidad {
+  id        Int     @id @default(autoincrement())
+  cvId      Int
+  cv        CV      @relation(fields: [cvId], references: [id])
+  nombre    String
+  categoria String?
+  nivel     Int?
+  evidencia String?
+
+  @@index([cvId])
+}
+
+model CVLogro {
+  id          Int       @id @default(autoincrement())
+  cvId        Int
+  cv          CV        @relation(fields: [cvId], references: [id])
+  titulo      String
+  descripcion String?   @default("")
+  fecha       DateTime?
+
+  @@index([cvId])
+}
+
+model CVProyecto {
+  id            Int       @id @default(autoincrement())
+  cvId          Int
+  cv            CV        @relation(fields: [cvId], references: [id])
+  titulo        String
+  descripcion   String?   @default("")
+  rol           String?   @default("")
+  area          String?   @default("")
+  tecnologias   String?   @default("")
+  linkEvidencia String?
+  fechaInicio   DateTime?
+  fechaFin      DateTime?
+
+  @@index([cvId])
+}
+
+model ReporteGenerado {
+  id            Int               @id @default(autoincrement())
+  tipo          TipoReporte
+  periodoId     Int?
+  periodo       PeriodoAcademico? @relation(fields: [periodoId], references: [id])
+  generadoPorId Int
+  generadoPor   Usuario           @relation(fields: [generadoPorId], references: [id])
+  filtrosJson   Json?
+  resultadoJson Json
+  archivoUrl    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([tipo])
+  @@index([periodoId])
+  @@index([generadoPorId])
 }

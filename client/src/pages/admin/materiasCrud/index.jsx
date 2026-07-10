@@ -68,9 +68,9 @@ const makeCode = (nombre) => {
 };
 
 const BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
-const API = `${BASE}/materia`;
-const API_CARRERA = `${BASE}/carrera`;
-const API_SEM_BY_CARRERA = `${BASE}/semestre/by-carrera`;
+const API = `${BASE}/api/materia`;
+const API_CARRERA = `${BASE}/api/carrera`;
+const API_SEM_BY_CARRERA = `${BASE}/api/semestre/by-carrera`;
 const FETCH_OPTS = { credentials: "include", headers: { "Content-Type": "application/json" } };
 
 const MateriasCRUD = () => {

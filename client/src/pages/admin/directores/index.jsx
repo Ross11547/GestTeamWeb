@@ -110,7 +110,7 @@ const Directores = () => {
     try {
       setLoading(true);
       setErr("");
-      const u = new URL(`${BASE}/director`);
+      const u = new URL(`${BASE}/api/director`);
       if (q) u.searchParams.set("q", q);
       const r = await fetch(u, FETCH_OPTS);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -124,7 +124,7 @@ const Directores = () => {
   };
 
   const fetchDirectorById = async (id) => {
-    const r = await fetch(`${BASE}/director/${id}`, FETCH_OPTS);
+    const r = await fetch(`${BASE}/api/director/${id}`, FETCH_OPTS);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
   };
@@ -132,14 +132,14 @@ const Directores = () => {
   // CRUD operations
   const handleCreate = async (payload) => {
     try {
-      const r = await fetch(`${BASE}/director`, {
+      const r = await fetch(`${BASE}/api/director`, {
         ...FETCH_OPTS,
         method: "POST",
         body: JSON.stringify(payload),
       });
       const txt = await readText(r);
       const j = (() => { try { return JSON.parse(txt); } catch { return {}; } })();
-      if (!r.ok) throw new Error(j?.message || `POST /director -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
+      if (!r.ok) throw new Error(j?.message || `POST /api/director -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
       toast.success("Director creado correctamente");
       await loadDirectores(searchTerm);
     } catch (e) {
@@ -153,14 +153,14 @@ const Directores = () => {
 
   const handleUpdate = async (id, actualizado) => {
     try {
-      const r = await fetch(`${BASE}/director/${id}`, {
+      const r = await fetch(`${BASE}/api/director/${id}`, {
         ...FETCH_OPTS,
         method: "PUT",
         body: JSON.stringify(actualizado),
       });
       const txt = await readText(r);
       const j = (() => { try { return JSON.parse(txt); } catch { return {}; } })();
-      if (!r.ok) throw new Error(j?.message || `PUT /director/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
+      if (!r.ok) throw new Error(j?.message || `PUT /api/director/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
       toast.success("Director actualizado");
       await loadDirectores(searchTerm);
     } catch (e) {
@@ -179,7 +179,7 @@ const Directores = () => {
       const r = await fetch(`${BASE}/director/${id}`, { ...FETCH_OPTS, method: "DELETE" });
       const txt = await readText(r);
       const j = (() => { try { return JSON.parse(txt); } catch { return {}; } })();
-      if (!r.ok) throw new Error(j?.message || `DELETE /director/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
+      if (!r.ok) throw new Error(j?.message || `DELETE /api/director/${id} -> ${r.status} ${r.statusText} ${txt.slice(0,120)}`);
       toast.success("Director eliminado");
       await loadDirectores(searchTerm);
     } catch (e) {
@@ -190,13 +190,13 @@ const Directores = () => {
 
   // Catálogos
   const loadFacultades = async () => {
-    const r = await fetch(`${BASE}/facultad`, FETCH_OPTS);
+    const r = await fetch(`${BASE}/api/facultad`, FETCH_OPTS);
     const { data } = await r.json();
     setFacultades(data || []);
   };
   const loadCarreras = async (fid) => {
     if (!fid) return setCarreras([]);
-    const u = new URL(`${BASE}/carrera`);
+    const u = new URL(`${BASE}/api/carrera`);
     u.searchParams.set("idFacultad", String(fid));
     const r = await fetch(u, FETCH_OPTS);
     const { data } = await r.json();
@@ -204,7 +204,7 @@ const Directores = () => {
   };
   const loadMaterias = async (cid) => {
     if (!cid) return setMaterias([]);
-    const u = new URL(`${BASE}/materia`);
+    const u = new URL(`${BASE}/api/materia`);
     u.searchParams.set("idCarrera", String(cid));
     const r = await fetch(u, FETCH_OPTS);
     const { data } = await r.json();

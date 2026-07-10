@@ -58,8 +58,8 @@ const SemestreCRUD = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const API = "http://localhost:3000/semestre";
-    const API_CARRERA = "http://localhost:3000/carrera";
+    const API = "http://localhost:3000/api/semestre";
+    const API_CARRERA = "http://localhost:3000/api/carrera";
 
     const readErrorMsg = async (res) => {
         try { const j = await res.json(); return j?.message || res.statusText; }

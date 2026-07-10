@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "TipoCuentaGithub" AS ENUM ('INSTITUTIONAL', 'PERSONAL');
+CREATE TYPE "TipoCuentaGithub" AS ENUM ('INSTITUCIONAL', 'PERSONAL');
 
 -- CreateEnum
 CREATE TYPE "TipoGrupo" AS ENUM ('INDIVIDUAL', 'GROUP');
